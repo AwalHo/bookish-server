@@ -9,7 +9,7 @@ import cookieParser from 'cookie-parser';
 const app: Application = express();
 
 const allowedOrigins = [
-  'https://bookish-server-production.up.railway.app',
+  'https://bookishly.netlify.app',
   'http://127.0.0.1:5173'
 ]
 

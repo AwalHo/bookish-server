@@ -25,7 +25,7 @@ const auth = (...requiredRoles) => (req, res, next) => __awaiter(void 0, void 0,
         }
         // verify token
         let verifiedUser = null;
-        verifiedUser = jwtHelpers_1.jwtHelpers.verifyToken(token, config_1.default.jwt.secret);
+        verifiedUser = jwtHelpers_1.jwtHelpers.verifyToken(token, config_1.default.jwt.refresh_secret);
         req.user = verifiedUser; // role  , userid
         // role diye guard korar jnno
         if (requiredRoles.length && !requiredRoles.includes(verifiedUser.role)) {
