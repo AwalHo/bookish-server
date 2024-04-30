@@ -11,14 +11,19 @@ const auth =
     try {
       //get authorization token
       const token = req.headers.authorization;
-      
+
       if (!token) {
         throw new ApiError(httpStatus.UNAUTHORIZED, 'You are not authorized');
       }
       // verify token
       let verifiedUser = null;
 
-      verifiedUser = jwtHelpers.verifyToken(token, config.jwt.refresh_secret as Secret);
+      verifiedUser = jwtHelpers.verifyToken(
+        token,
+        config.jwt.refresh_secret as Secret
+      );
+
+      console.log(verifiedUser, 'verified user');
 
       req.user = verifiedUser; // role  , userid
 
