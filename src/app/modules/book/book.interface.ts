@@ -1,8 +1,10 @@
+/* eslint-disable no-unused-vars */
 import { Model } from 'mongoose';
 
 export type reviews = {
   email: string;
-  review: string;
+  description: string;
+  rating: string;
 };
 
 export type IBook = {
@@ -15,7 +17,12 @@ export type IBook = {
   genre: string;
   publicationYear: string;
   reviews?: reviews[];
-  addedBy: string
+  addedBy: string;
+  userPreference: string;
+  addUserPreference(userId: string, status: string): Promise<void>;
+  updateUserPreference(userId: string, newStatus: string): Promise<void>;
+  removeUserPreference(userId: string): Promise<void>;
+  status: string;
 };
 
 export type IbookFilters = {
@@ -23,6 +30,5 @@ export type IbookFilters = {
   genre?: string;
   publicationYear?: string;
 };
-
 
 export type BookModel = Model<IBook, Record<string, unknown>>;
