@@ -7,7 +7,7 @@ export type IUser = {
   password: string;
   role: string;
   _id: string;
-  wishlist?: string[];
+  userPrefernce?: string[];
   readingList?: string[];
   finishedBooks?: string[];
 };
@@ -20,7 +20,7 @@ export type ILoginUserResponse = {
 export type UserModel = {
   isUserExist(
     email: string
-  ): Promise<Pick<IUser, 'email' | 'password' | '_id' | 'role' >>;
+  ): Promise<Pick<IUser, 'email' | 'password' | '_id' | 'role'>>;
   isPasswordMatch(
     givenPassword: string,
     savePassword: string
