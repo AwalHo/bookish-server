@@ -1,5 +1,5 @@
+import { Request } from 'express';
 import httpStatus from 'http-status';
-import { JwtPayload } from 'jsonwebtoken';
 import { SortOrder } from 'mongoose';
 import ApiError from '../../../errors/ApiError';
 import { paginationHelpers } from '../../../helpers/paginationHelper';
@@ -21,40 +21,50 @@ const addBook = async (data: IBook) => {
   }
 };
 
+const addUserPreference = async (req: Request) => {
+  const { bookId, status } = req.body;
+  const user = req.user;
+  const book = await Book.findById(bookId).populate('userPreference');
+  if (!book) {
+    throw new Error('Book not found');
+  }
+
+  console.log(book, 'result');
+  const result = await book.addUserPreference(user?._id, status);
+
+  return result;
+};
+
 const getAllBooks = async (
   filters: IbookFilters,
-  paginationOptions: IPaginationOptions,
+  paginationOptions: IPaginationOptions
 ): Promise<IGenericResponse<IBook[]>> => {
-
   const { searchTerm, ...filtersData } = filters;
 
-
-  const { limit, skip, page, sortBy, sortOrder } = paginationHelpers.calculatePagination(paginationOptions);
+  const { limit, skip, page, sortBy, sortOrder } =
+    paginationHelpers.calculatePagination(paginationOptions);
 
   const andConditions = [];
 
   // search needs $or condition for search in specified fields
   if (searchTerm) {
     andConditions.push({
-      $or: bookSearchableFields.map((field) => ({
+      $or: bookSearchableFields.map(field => ({
         [field]: {
           $regex: searchTerm,
           $options: 'i',
         },
-      }
-      ))
-    })
+      })),
+    });
   }
 
   if (Object.keys(filtersData).length) {
     andConditions.push({
-      $and: Object.entries(filtersData)
-        .map(([key, value]) => ({
-          [key]: value,
-        }))
+      $and: Object.entries(filtersData).map(([key, value]) => ({
+        [key]: value,
+      })),
     });
   }
-
 
   // dynamic sort needs fild to do sorting on
 
@@ -64,14 +74,14 @@ const getAllBooks = async (
     sortCondition[sortBy] = sortOrder;
   }
 
-  const whereCondition = andConditions.length > 0 ? { $and: andConditions } : {};
+  const whereCondition =
+    andConditions.length > 0 ? { $and: andConditions } : {};
   console.log(sortCondition, 'checking ');
-
 
   const result = await Book.find(whereCondition)
     .sort(sortCondition)
     .skip(skip)
-    .limit(limit)
+    .limit(limit);
 
   const total = await Book.countDocuments();
 
@@ -82,7 +92,7 @@ const getAllBooks = async (
       total,
     },
     data: result,
-  }
+  };
 };
 
 const getSingleBook = async (id: string) => {
@@ -95,7 +105,11 @@ const getSingleBook = async (id: string) => {
   return book;
 };
 
-const addReview = async (review: string, user: JwtPayload | null, bookId: string) => {
+const addReview = async (req: Request) => {
+  const { bookId } = req.params;
+  const user = req.user;
+  const { description, rating } = req.body;
+
   const book = await Book.findById(bookId);
 
   if (!book) {
@@ -103,20 +117,15 @@ const addReview = async (review: string, user: JwtPayload | null, bookId: string
   }
   const email = user?.email;
 
-  console.log({ email, review }, 'checking');
-  const payload = { email, review };
-
-  book?.reviews?.push({ email, review });
+  book?.reviews?.push({ email, description, rating });
 
   await book.save();
 
   return book;
-}
+};
 
 const editBook = async (id: string, data: IBook) => {
-
-  console.log(id,data);
-  
+  console.log(id, data);
 
   const book = await Book.findByIdAndUpdate(id, data, { new: true });
 
@@ -125,7 +134,7 @@ const editBook = async (id: string, data: IBook) => {
   }
 
   return book;
-}
+};
 
 const deleteBook = async (id: string) => {
   const book = await Book.findByIdAndDelete(id);
@@ -135,13 +144,14 @@ const deleteBook = async (id: string) => {
   }
 
   return book;
-}
+};
 
 export const bookService = {
   addBook,
   getAllBooks,
   getSingleBook,
   addReview,
-   editBook,
-   deleteBook
+  editBook,
+  deleteBook,
+  addUserPreference,
 };
