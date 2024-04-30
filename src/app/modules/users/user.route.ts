@@ -25,53 +25,43 @@ router.post(
 );
 
 router.post(
-  '/wishlist',
-   auth(ENUM_USER_ROLE.USER),
-   UserController.wishlist
+  '/preference',
+  auth(ENUM_USER_ROLE.USER),
+  UserController.userPreference
 );
-router.get(
-  '/wishlist',
-   auth(ENUM_USER_ROLE.USER),
-   UserController.getWishList
-);
+router.get('/wishlist', auth(ENUM_USER_ROLE.USER), UserController.getWishList);
 router.patch(
   '/wishlist/:bookId',
-   auth(ENUM_USER_ROLE.USER),
-   UserController.removeFromWishlist
+  auth(ENUM_USER_ROLE.USER),
+  UserController.removeFromWishlist
 );
 
 router.post(
   '/readinglist',
-   auth(ENUM_USER_ROLE.USER),
-   UserController.readingList
+  auth(ENUM_USER_ROLE.USER),
+  UserController.readingList
 );
 router.get(
   '/readinglist',
-   auth(ENUM_USER_ROLE.USER),
-   UserController.getReadingList
+  auth(ENUM_USER_ROLE.USER),
+  UserController.getReadingList
 );
 router.patch(
   '/readinglist/:bookId',
-   auth(ENUM_USER_ROLE.USER),
-   UserController.removeFromReadingList
+  auth(ENUM_USER_ROLE.USER),
+  UserController.removeFromReadingList
 );
 router.post(
   '/finishedBook',
-   auth(ENUM_USER_ROLE.USER),
-   UserController.finishedBooks
+  auth(ENUM_USER_ROLE.USER),
+  UserController.finishedBooks
 );
 router.get(
   '/finishedBook',
-   auth(ENUM_USER_ROLE.USER),
-   UserController.getFinishedBooks
+  auth(ENUM_USER_ROLE.USER),
+  UserController.getFinishedBooks
 );
 
-
-
-router.get(
-  '/me',
-  auth(ENUM_USER_ROLE.USER),
-  UserController.getMe
-)
+router.get('/me', auth(ENUM_USER_ROLE.USER), UserController.getMe);
 
 export const UserRoutes = router;
