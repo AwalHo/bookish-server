@@ -42,7 +42,6 @@ const loginUser: RequestHandler = catchAsync(
     const cookieOptions = {
       secure: config.env === 'production',
       httpOnly: true,
-
     };
 
     res.cookie('refreshToken', refreshToken, cookieOptions);
@@ -56,12 +55,8 @@ const loginUser: RequestHandler = catchAsync(
   }
 );
 
-
-const wishlist = catchAsync(async (req: Request, res: Response) => {
-  const { bookId } = req.body;
-  const user = req.user;
-  console.log(bookId, 'bookId wishlisht');
-  const result = await UserService.wishlist(user, bookId);
+const userPreference = catchAsync(async (req: Request, res: Response) => {
+  const result = await UserService.userPreference(req);
 
   sendResponse(res, {
     statusCode: 200,
@@ -69,30 +64,26 @@ const wishlist = catchAsync(async (req: Request, res: Response) => {
     message: 'Added to wishlist !',
     data: result,
   });
-}
-);
-
+});
 
 const getWishList = catchAsync(async (req: Request, res: Response) => {
   const user = req.user;
   const result = await UserService.getWishList(user);
-  
+
   sendResponse(res, {
     statusCode: 200,
     success: true,
     message: 'Gett the wishlist !',
     data: result,
   });
-}
-)
+});
 
 const removeFromWishlist = catchAsync(async (req: Request, res: Response) => {
-
   const user = req.user;
 
   const { bookId } = req.params;
-  console.log(bookId,'bookis');
-  
+  console.log(bookId, 'bookis');
+
   const result = await UserService.removeFromWishlist(user, bookId);
 
   sendResponse(res, {
@@ -100,16 +91,13 @@ const removeFromWishlist = catchAsync(async (req: Request, res: Response) => {
     success: true,
     message: 'Remove from the Wishlist !',
     data: result,
-  })
-}
-)
-
+  });
+});
 
 const readingList = catchAsync(async (req: Request, res: Response) => {
   const { bookId } = req.body;
   const user = req.user;
   const result = await UserService.readingList(user, bookId);
-  
 
   sendResponse(res, {
     statusCode: 200,
@@ -117,9 +105,7 @@ const readingList = catchAsync(async (req: Request, res: Response) => {
     message: 'Added to Readinglist !',
     data: result,
   });
-}
-)
-
+});
 
 const getReadingList = catchAsync(async (req: Request, res: Response) => {
   const user = req.user;
@@ -131,28 +117,25 @@ const getReadingList = catchAsync(async (req: Request, res: Response) => {
     message: 'get the Readin list !',
     data: result,
   });
-}
-)
+});
 
-const removeFromReadingList = catchAsync(async (req: Request, res: Response) => {
+const removeFromReadingList = catchAsync(
+  async (req: Request, res: Response) => {
+    const user = req.user;
 
-  const user = req.user;
+    const { bookId } = req.params;
+    console.log(bookId, 'from readinglist');
 
-  const { bookId } = req.params;
-  console.log(bookId, 'from readinglist');
-  
-  const result = await UserService.removeFromReadingList(user, bookId);
+    const result = await UserService.removeFromReadingList(user, bookId);
 
-  sendResponse(res, {
-    statusCode: 200,
-    success: true,
-    message: 'Remove from the Readinglist !',
-    data: result,
-  })
-}
-)
-
-
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: 'Remove from the Readinglist !',
+      data: result,
+    });
+  }
+);
 
 const finishedBooks = catchAsync(async (req: Request, res: Response) => {
   const { bookId } = req.body;
@@ -166,9 +149,7 @@ const finishedBooks = catchAsync(async (req: Request, res: Response) => {
     message: 'Added to wishlist !',
     data: result,
   });
-}
-)
-
+});
 
 const getFinishedBooks = catchAsync(async (req: Request, res: Response) => {
   const user = req.user;
@@ -180,9 +161,7 @@ const getFinishedBooks = catchAsync(async (req: Request, res: Response) => {
     message: 'Added to wishlist !',
     data: result,
   });
-}
-)
-
+});
 
 const refreshToken = catchAsync(async (req: Request, res: Response) => {
   const { refreshToken } = req.cookies;
@@ -200,7 +179,6 @@ const refreshToken = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getMe = catchAsync(async (req: Request, res: Response) => {
-
   const user = req.user;
   sendResponse(res, {
     statusCode: 200,
@@ -208,14 +186,14 @@ const getMe = catchAsync(async (req: Request, res: Response) => {
     message: 'User profile !',
     data: user,
   });
-})
+});
 
 export const UserController = {
   createUser,
   loginUser,
   refreshToken,
   getMe,
-  wishlist,
+  userPreference,
   readingList,
   finishedBooks,
   getFinishedBooks,
@@ -223,5 +201,4 @@ export const UserController = {
   getReadingList,
   removeFromReadingList,
   removeFromWishlist,
-
 };
