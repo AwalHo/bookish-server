@@ -4,9 +4,9 @@ import config from '../../../config';
 import { IUser, UserModel } from './user.interface';
 
 const UserSchema = new Schema<IUser>({
-  name:{
-    type:String,
-    required:true
+  name: {
+    type: String,
+    required: true,
   },
   email: {
     type: String,
@@ -23,12 +23,6 @@ const UserSchema = new Schema<IUser>({
     enum: ['user', 'admin'],
     default: 'user',
   },
-  wishlist: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: 'Book', 
-    },
-  ],
   readingList: [
     {
       type: Schema.Types.ObjectId,
@@ -40,6 +34,18 @@ const UserSchema = new Schema<IUser>({
     {
       type: Schema.Types.ObjectId,
       ref: 'Book',
+    },
+  ],
+  userPrefernce: [
+    {
+      book: {
+        type: Schema.Types.ObjectId,
+        ref: 'Book',
+      },
+      status: {
+        type: String,
+        enum: ['read', 'reading', 'finished'],
+      },
     },
   ],
 });
