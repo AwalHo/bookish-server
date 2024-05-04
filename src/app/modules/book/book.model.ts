@@ -30,15 +30,18 @@ const BookSchema = new Schema<IBook>(
       type: String,
       required: true,
     },
+    avgRating: {
+      type: String,
+      default: '0',
+    },
     reviews: [
       {
-        email: {
-          type: String,
+        userId: {
+          type: Schema.Types.ObjectId,
           ref: 'User',
         },
         description: {
           type: String,
-          required: true,
         },
         rating: {
           type: String,
@@ -53,6 +56,7 @@ const BookSchema = new Schema<IBook>(
       {
         user: { type: Schema.Types.ObjectId, ref: 'User', unique: true },
         status: { type: String, enum: ['read', 'reading', 'finished'] },
+        updatedAt: { type: Date },
       },
     ],
     status: {
@@ -71,21 +75,27 @@ BookSchema.methods.addUserPreference = async function (
   status: string
 ) {
   try {
+    console.log(this.userPreference, 'exit', userId, status);
     const existingPreference = this.userPreference.find(
-      (pref: Preference) => pref.user.toString() === userId.toString()
+      (pref: Preference) =>
+        pref.user && pref.user.toString() === userId.toString()
     );
-
-    console.log(existingPreference, 'exit');
 
     if (existingPreference) {
       existingPreference.status = status;
+      existingPreference.updatedAt = new Date();
     } else {
-      this.userPreference.push({ user: userId, status });
+      this.userPreference.push({
+        user: userId,
+        status,
+        updatedAt: new Date(),
+      });
     }
 
     const updatedBook = await this.save();
     return updatedBook;
   } catch (err) {
+    console.error(err);
     throw new ApiError(400, 'User preference not added');
   }
 };
@@ -97,7 +107,8 @@ BookSchema.methods.updateUserPreference = async function (
   const book = this;
 
   const existingPreference = book.userPreference.find(
-    (preference: Preference) => preference.user.toString() === userId.toString()
+    (preference: Preference) =>
+      preference.user && preference.user.toString() === userId.toString()
   );
 
   if (existingPreference) {
