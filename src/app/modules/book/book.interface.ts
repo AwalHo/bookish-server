@@ -2,7 +2,7 @@
 import { Model } from 'mongoose';
 
 export type reviews = {
-  email: string;
+  userId: string;
   description: string;
   rating: string;
 };
@@ -23,6 +23,7 @@ export type IBook = {
   updateUserPreference(userId: string, newStatus: string): Promise<void>;
   removeUserPreference(userId: string): Promise<void>;
   status: string;
+  avgRating: string;
 };
 
 export type IbookFilters = {
