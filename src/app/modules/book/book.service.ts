@@ -29,7 +29,7 @@ const addUserPreference = async (req: Request) => {
     throw new Error('Book not found');
   }
 
-  console.log(book, 'result');
+  console.log(book, 'result', req.body, req.user);
   const result = await book.addUserPreference(user?._id, status);
 
   return result;
@@ -96,8 +96,11 @@ const getAllBooks = async (
 };
 
 const getSingleBook = async (id: string) => {
-  const book = await Book.findById(id).populate('reviews._id');
-
+  const book = await Book.findById(id).lean().populate({
+    path: 'reviews.userId',
+    model: 'User', // Specify the name of the User model
+    select: 'name email', // Optionally, you can specify which fields to include
+  });
   if (!book) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Book not found');
   }
@@ -115,9 +118,9 @@ const addReview = async (req: Request) => {
   if (!book) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Book not found');
   }
-  const email = user?.email;
+  const userId = user?._id;
 
-  book?.reviews?.push({ email, description, rating });
+  book?.reviews?.push({ userId, description, rating });
 
   await book.save();
 
