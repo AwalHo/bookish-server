@@ -122,6 +122,14 @@ const addReview = async (req: Request) => {
 
   book?.reviews?.push({ userId, description, rating });
 
+  // increment the rating count
+  book.ratingCount = book.ratingCount + 1;
+
+  // calculate the avg rating
+  const totalRating =
+    book.reviews?.reduce((sum, review) => sum + Number(review.rating), 0) || 0;
+  book.avgRating = (totalRating / book.ratingCount).toFixed(2);
+
   await book.save();
 
   return book;
