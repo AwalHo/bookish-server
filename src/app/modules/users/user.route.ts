@@ -29,32 +29,11 @@ router.post(
   auth(ENUM_USER_ROLE.USER),
   UserController.userPreference
 );
-router.get('/wishlist', auth(ENUM_USER_ROLE.USER), UserController.getWishList);
-router.patch(
-  '/wishlist/:bookId',
-  auth(ENUM_USER_ROLE.USER),
-  UserController.removeFromWishlist
-);
 
-router.post(
-  '/readinglist',
-  auth(ENUM_USER_ROLE.USER),
-  UserController.readingList
-);
 router.get(
-  '/readinglist',
+  '/preferences',
   auth(ENUM_USER_ROLE.USER),
-  UserController.getReadingList
-);
-router.patch(
-  '/readinglist/:bookId',
-  auth(ENUM_USER_ROLE.USER),
-  UserController.removeFromReadingList
-);
-router.post(
-  '/finishedBook',
-  auth(ENUM_USER_ROLE.USER),
-  UserController.finishedBooks
+  UserController.getUserPreferences
 );
 router.get(
   '/finishedBook',
