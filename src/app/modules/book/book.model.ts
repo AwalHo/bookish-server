@@ -14,16 +14,60 @@ const BookSchema = new Schema<IBook>(
       type: String,
       required: true,
     },
+    description: {
+      type: String,
+      required: true,
+      maxlength: 1500,
+    },
+    summary: {
+      type: String,
+      required: true,
+      maxlength: 500,
+    },
     author: {
       type: String,
       required: true,
     },
     genre: {
-      type: String,
+      type: [String],
+      enum: [
+        'History',
+        'Science',
+        'Fiction',
+        'Biography',
+        'Mystery',
+        'Fantasy',
+        'Romance',
+        'Thriller',
+        'Horror',
+        'Self-help',
+        'Health',
+        'Guide',
+        'Travel',
+        'Children',
+        'Religion',
+        'Science Fiction',
+        'Poetry',
+        'Drama',
+        'Autobiography',
+        'Encyclopedia',
+        'Comics',
+        'Novel',
+        'Memoir',
+        'Technical',
+        'Business',
+        'Scientific',
+        'Historical',
+        'Economic',
+        'Educational',
+        'Religious',
+        'Philosophical',
+        'Psychological',
+      ],
       required: true,
     },
     publicationYear: {
-      type: String,
+      type: Date,
       required: true,
     },
     thumbnail: {
@@ -33,6 +77,10 @@ const BookSchema = new Schema<IBook>(
     avgRating: {
       type: String,
       default: '0',
+    },
+    ratingCount: {
+      type: Number,
+      default: 0,
     },
     reviews: [
       {
@@ -98,24 +146,6 @@ BookSchema.methods.addUserPreference = async function (
     console.error(err);
     throw new ApiError(400, 'User preference not added');
   }
-};
-
-BookSchema.methods.updateUserPreference = async function (
-  userId: string,
-  newStatus: string
-) {
-  const book = this;
-
-  const existingPreference = book.userPreference.find(
-    (preference: Preference) =>
-      preference.user && preference.user.toString() === userId.toString()
-  );
-
-  if (existingPreference) {
-    existingPreference.status = newStatus;
-  }
-
-  await this.save();
 };
 
 BookSchema.methods.removeUserPreference = async function (userId: string) {
