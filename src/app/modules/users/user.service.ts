@@ -166,12 +166,12 @@ const finishedBooks = async (user: JwtPayload | null, bookId: string) => {
   await existingUser.save();
 };
 
-const getFinishedBooks = async (user: JwtPayload | null) => {
+const getUserPreferences = async (user: JwtPayload | null) => {
   //get the reading list product
-  const existingUser = await User.findOne({ email: user?.email }).populate(
-    'finishedBooks'
-  );
-  return existingUser;
+  const result = await User.findOne({ email: user?.email }).populate({
+    path: 'userPrefernce.book',
+  });
+  return result?.userPrefernce;
 };
 
 const refreshToken = async (token: string): Promise<ILoginUserResponse> => {
@@ -219,7 +219,7 @@ export const UserService = {
   userPreference,
   readingList,
   finishedBooks,
-  getFinishedBooks,
+  getUserPreferences,
   getWishList,
   getReadingList,
   removeFromReadingList,
