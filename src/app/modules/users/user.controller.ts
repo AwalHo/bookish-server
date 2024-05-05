@@ -3,6 +3,7 @@ import config from '../../../config';
 import catchAsync from '../../../shared/catchAsync';
 import sendResponse from '../../../shared/sendResponse';
 import { ILoginUserResponse } from './user.interface';
+import { User } from './user.model';
 import { UserService } from './user.service';
 
 const createUser: RequestHandler = catchAsync(
@@ -78,22 +79,6 @@ const getWishList = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-const removeFromWishlist = catchAsync(async (req: Request, res: Response) => {
-  const user = req.user;
-
-  const { bookId } = req.params;
-  console.log(bookId, 'bookis');
-
-  const result = await UserService.removeFromWishlist(user, bookId);
-
-  sendResponse(res, {
-    statusCode: 200,
-    success: true,
-    message: 'Remove from the Wishlist !',
-    data: result,
-  });
-});
-
 const readingList = catchAsync(async (req: Request, res: Response) => {
   const { bookId } = req.body;
   const user = req.user;
@@ -137,23 +122,23 @@ const removeFromReadingList = catchAsync(
   }
 );
 
-const finishedBooks = catchAsync(async (req: Request, res: Response) => {
+const getUserPreferences = catchAsync(async (req: Request, res: Response) => {
   const { bookId } = req.body;
   const user = req.user;
   console.log(bookId, 'bookId finished book');
-  const result = await UserService.finishedBooks(user, bookId);
+  const result = await UserService.getUserPreferences(user);
 
   sendResponse(res, {
     statusCode: 200,
     success: true,
-    message: 'Added to wishlist !',
+    message: 'User preferences fetched!',
     data: result,
   });
 });
 
 const getFinishedBooks = catchAsync(async (req: Request, res: Response) => {
   const user = req.user;
-  const result = await UserService.getFinishedBooks(user);
+  const result = await UserService.getUserPreferences(user);
 
   sendResponse(res, {
     statusCode: 200,
@@ -179,7 +164,10 @@ const refreshToken = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getMe = catchAsync(async (req: Request, res: Response) => {
-  const user = req.user;
+  const id = req.user?._id;
+  console.log(id, 'check');
+
+  const user = await User.findById(id).lean();
   sendResponse(res, {
     statusCode: 200,
     success: true,
@@ -195,10 +183,9 @@ export const UserController = {
   getMe,
   userPreference,
   readingList,
-  finishedBooks,
+  getUserPreferences,
   getFinishedBooks,
   getWishList,
   getReadingList,
   removeFromReadingList,
-  removeFromWishlist,
 };
