@@ -9,13 +9,15 @@ export type reviews = {
 
 export type IBook = {
   title: string;
+  description: string;
+  summary: string;
   author: string;
   thumbnail: string;
   price: string;
   rating: string;
   featured: boolean;
-  genre: string;
-  publicationYear: string;
+  genre: [string];
+  publicationYear: Date;
   reviews?: reviews[];
   addedBy: string;
   userPreference: string;
@@ -24,6 +26,7 @@ export type IBook = {
   removeUserPreference(userId: string): Promise<void>;
   status: string;
   avgRating: string;
+  ratingCount: number;
 };
 
 export type IbookFilters = {
