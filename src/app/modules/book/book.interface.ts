@@ -7,6 +7,12 @@ export type reviews = {
   rating: string;
 };
 
+export type UserPref = {
+  user: string;
+  status: string;
+  updatedAt: Date;
+};
+
 export type IBook = {
   title: string;
   description: string;
@@ -21,7 +27,11 @@ export type IBook = {
   reviews?: reviews[];
   addedBy: string;
   userPreference: string;
-  addUserPreference(userId: string, status: string): Promise<void>;
+  addUserPreference(
+    userId: string,
+    status: string,
+    updatedAt?: Date
+  ): Promise<void>;
   updateUserPreference(userId: string, newStatus: string): Promise<void>;
   removeUserPreference(userId: string): Promise<void>;
   status: string;
