@@ -56,16 +56,27 @@ const loginUser: RequestHandler = catchAsync(
   }
 );
 
-const userPreference = catchAsync(async (req: Request, res: Response) => {
-  const result = await UserService.userPreference(req);
+// const userPreference = catchAsync(async (req: Request, res: Response) => {
+//   const user = req.user;
+//   console.log(req.body, 'req.body');
 
-  sendResponse(res, {
-    statusCode: 200,
-    success: true,
-    message: 'Added to wishlist !',
-    data: result,
-  });
-});
+//   const { bookId, status } = req.body;
+
+//   const data = {
+//     userId: user?._id,
+//     bookId,
+//     status,
+//   };
+
+//   const result = await UserService.userPreference({ data });
+
+//   sendResponse(res, {
+//     statusCode: 200,
+//     success: true,
+//     message: 'Added to UserPrefer!',
+//     data: result,
+//   });
+// });
 
 const getWishList = catchAsync(async (req: Request, res: Response) => {
   const user = req.user;
@@ -104,24 +115,6 @@ const getReadingList = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-const removeFromReadingList = catchAsync(
-  async (req: Request, res: Response) => {
-    const user = req.user;
-
-    const { bookId } = req.params;
-    console.log(bookId, 'from readinglist');
-
-    const result = await UserService.removeFromReadingList(user, bookId);
-
-    sendResponse(res, {
-      statusCode: 200,
-      success: true,
-      message: 'Remove from the Readinglist !',
-      data: result,
-    });
-  }
-);
-
 const getUserPreferences = catchAsync(async (req: Request, res: Response) => {
   const { bookId } = req.body;
   const user = req.user;
@@ -132,6 +125,20 @@ const getUserPreferences = catchAsync(async (req: Request, res: Response) => {
     statusCode: 200,
     success: true,
     message: 'User preferences fetched!',
+    data: result,
+  });
+});
+
+const removeUserPreference = catchAsync(async (req: Request, res: Response) => {
+  const { bookId } = req.params;
+  const user = req.user;
+  console.log(bookId, 'bookId finished book');
+  const result = await UserService.removeUserPreference(user, bookId);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'User preferences removed!',
     data: result,
   });
 });
@@ -181,11 +188,10 @@ export const UserController = {
   loginUser,
   refreshToken,
   getMe,
-  userPreference,
   readingList,
   getUserPreferences,
   getFinishedBooks,
   getWishList,
   getReadingList,
-  removeFromReadingList,
+  removeUserPreference,
 };
