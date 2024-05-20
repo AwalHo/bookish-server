@@ -1,10 +1,11 @@
 import { Request } from 'express';
 import httpStatus from 'http-status';
-import { SortOrder } from 'mongoose';
+import mongoose, { SortOrder } from 'mongoose';
 import ApiError from '../../../errors/ApiError';
 import { paginationHelpers } from '../../../helpers/paginationHelper';
 import { IGenericResponse } from '../../../interfaces/common';
 import { IPaginationOptions } from '../../../interfaces/pagination';
+import { UserService } from '../users/user.service';
 import { bookSearchableFields } from './book.constant';
 import { IBook, IbookFilters } from './book.interface';
 import { Book } from './book.model';
@@ -22,17 +23,42 @@ const addBook = async (data: IBook) => {
 };
 
 const addUserPreference = async (req: Request) => {
-  const { bookId, status } = req.body;
-  const user = req.user;
-  const book = await Book.findById(bookId).populate('userPreference');
-  if (!book) {
-    throw new Error('Book not found');
+  const session = await mongoose.startSession();
+  session.startTransaction();
+  try {
+    const { bookId, status } = req.body;
+    const user = req.user;
+
+    if (!user || !user._id) {
+      throw new Error('User or user ID not found');
+    }
+    const book = await Book.findById(bookId).populate('userPreference');
+    if (!book) {
+      throw new Error('Book not found');
+    }
+
+    console.log(book, 'result', req.body, req.user);
+    const result = await book.addUserPreference(user?._id, status);
+
+    const data = {
+      userId: user?._id,
+      bookId,
+      status,
+    };
+    // if(result.status){
+    const saveUserPreference = await UserService.userPreference({ data });
+
+    console.log(saveUserPreference);
+
+    await session.commitTransaction();
+    session.endSession();
+
+    return result;
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    throw new ApiError(500, 'Something went wrong'); // rethrow the error
   }
-
-  console.log(book, 'result', req.body, req.user);
-  const result = await book.addUserPreference(user?._id, status);
-
-  return result;
 };
 
 const getAllBooks = async (
@@ -118,7 +144,7 @@ const addReview = async (req: Request) => {
   if (!book) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Book not found');
   }
-  const userId = user?._id;
+  const userId = user && user?._id;
 
   book?.reviews?.push({ userId, description, rating });
 
