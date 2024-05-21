@@ -1,12 +1,17 @@
-import { Request } from 'express';
+/* eslint-disable @typescript-eslint/consistent-type-definitions */
 import httpStatus from 'http-status';
 import { JwtPayload, Secret } from 'jsonwebtoken';
 import { Types } from 'mongoose';
 import config from '../../../config';
 import ApiError from '../../../errors/ApiError';
 import { jwtHelpers } from '../../../helpers/jwtHelpers';
-import { ILoginUserResponse, IUser } from './user.interface';
+import { ILoginUserResponse, IUser, UserPref } from './user.interface';
 import { User } from './user.model';
+
+interface User extends Document {
+  userPrefernce: UserPref[];
+  save: () => Promise<void>;
+}
 
 const createUser = async (user: IUser): Promise<ILoginUserResponse> => {
   const isUserExist = await User.isUserExist(user.email);
@@ -76,12 +81,17 @@ const loginUser = async (user: IUser): Promise<ILoginUserResponse> => {
   };
 };
 
-const userPreference = async (req: Request) => {
-  const user = req.user;
-  console.log(req.body, 'req.body');
-
-  const { bookId, preference } = req.body;
-  const existingUser = await User.findOne({ email: user?.email });
+const userPreference = async ({
+  data,
+}: {
+  data: {
+    userId: string;
+    bookId: string;
+    status: string;
+  };
+}) => {
+  const { bookId, status, userId } = data;
+  const existingUser = await User.findById({ _id: userId });
   if (!existingUser) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'User does not exist');
   }
@@ -92,7 +102,8 @@ const userPreference = async (req: Request) => {
       $push: {
         userPrefernce: {
           book: bookId,
-          status: preference,
+          status,
+          updated: new Date(),
         },
       },
     },
@@ -135,24 +146,26 @@ const getReadingList = async (user: JwtPayload | null) => {
   return existingUser;
 };
 
-const removeFromReadingList = async (
+const removeUserPreference = async (
   user: JwtPayload | null,
   bookId: string
 ) => {
   // want to remove the product id in the wishlist
-
-  const existingUser = await User.findOne({ email: user?.email });
+  console.log(bookId,'chekcing di')
+  const existingUser = (await User.findOne({ email: user?.email })) as User;
   if (!existingUser) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'User does not exist');
   }
 
   const bookObjectId = new Types.ObjectId(bookId);
 
-  existingUser.readingList = existingUser.readingList?.filter(
-    id => !new Types.ObjectId(id).equals(bookObjectId)
+  existingUser.userPrefernce = existingUser.userPrefernce?.filter(
+    pref => !new Types.ObjectId(pref.book).equals(bookObjectId)
   );
 
-  await existingUser.save();
+  const result = await existingUser.save();
+
+  console.log(result, 'checking');
 };
 
 const finishedBooks = async (user: JwtPayload | null, bookId: string) => {
@@ -222,5 +235,5 @@ export const UserService = {
   getUserPreferences,
   getWishList,
   getReadingList,
-  removeFromReadingList,
+  removeUserPreference,
 };
