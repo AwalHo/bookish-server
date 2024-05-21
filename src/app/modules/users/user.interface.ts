@@ -12,6 +12,12 @@ export type IUser = {
   finishedBooks?: string[];
 };
 
+export type UserPref = {
+  book: string;
+  status: string;
+  updatedAt: Date;
+};
+
 export type ILoginUserResponse = {
   refreshToken?: string;
   accessToken: string;
