@@ -37,7 +37,7 @@ router.get(
 );
 
 router.delete(
-  '/remove/preferece/:bookId',
+  '/remove/preference/:bookId',
   auth(ENUM_USER_ROLE.USER),
   UserController.removeUserPreference
 );
