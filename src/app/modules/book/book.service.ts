@@ -10,10 +10,10 @@ import { bookSearchableFields } from './book.constant';
 import { IBook, IbookFilters, UserPref } from './book.interface';
 import { Book } from './book.model';
 
-interface Book extends Document {
+type Book = {
   userPreference: UserPref[];
   save: () => Promise<void>;
-}
+} & Document
 
 
 const addBook = async (data: IBook) => {
@@ -80,11 +80,19 @@ const removeUserPreference = async (
     throw new ApiError(httpStatus.BAD_REQUEST, 'User does not exist');
   }
 
-  const result = await Book.
+  const result = await Book.findOneAndUpdate({_id:bookId},{
+    $pull:{
+      userPreference:{
+        user:userId
+      }
+    },
+  })
 
+  console.log(result,'result');
+  
 
+  return result;
 };
-
 
 const getAllBooks = async (
   filters: IbookFilters,
@@ -216,4 +224,5 @@ export const bookService = {
   editBook,
   deleteBook,
   addUserPreference,
+  removeUserPreference
 };
