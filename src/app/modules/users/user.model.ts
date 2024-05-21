@@ -46,6 +46,9 @@ const UserSchema = new Schema<IUser>({
         type: String,
         enum: ['read', 'reading', 'finished'],
       },
+      updatedAt: {
+        type: Date,
+      },
     },
   ],
 });
