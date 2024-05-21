@@ -1,16 +1,18 @@
 /* eslint-disable @typescript-eslint/consistent-type-definitions */
 import httpStatus from 'http-status';
 import { JwtPayload, Secret } from 'jsonwebtoken';
-import { Types } from 'mongoose';
+import { Types, startSession } from 'mongoose';
 import config from '../../../config';
 import ApiError from '../../../errors/ApiError';
 import { jwtHelpers } from '../../../helpers/jwtHelpers';
+import { bookService } from '../book/book.service';
 import { ILoginUserResponse, IUser, UserPref } from './user.interface';
 import { User } from './user.model';
 
 interface User extends Document {
-  userPrefernce: UserPref[];
+  userPreference: UserPref[];
   save: () => Promise<void>;
+  _id: string;
 }
 
 const createUser = async (user: IUser): Promise<ILoginUserResponse> => {
@@ -95,24 +97,26 @@ const userPreference = async ({
   if (!existingUser) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'User does not exist');
   }
+console.log(existingUser, 'existingUser checking again');
 
-  const preferences = await User.findByIdAndUpdate(
-    existingUser._id,
-    {
-      $push: {
-        userPrefernce: {
-          book: bookId,
-          status,
-          updated: new Date(),
-        },
-      },
-    },
-    {
-      new: true,
-    }
-  );
-  console.log(preferences, 'preferences');
-  return preferences;
+  const existingPreference = existingUser.userPrefernce.find(pref => new Types.ObjectId(pref.book).toString() === bookId.toString());
+  console.log(existingPreference, 'existingPreference checking');
+  
+
+  if(existingPreference){
+    existingPreference.status = status;
+    existingPreference.updatedAt = new Date();
+  }else{
+    existingUser.userPrefernce.push({
+      book: bookId,
+      status,
+    updatedAt: new Date()
+    })
+  }
+  const updatedUser = await existingUser.save();
+
+  console.log(updatedUser, 'preferences');
+  return updatedUser;
 };
 
 const getWishList = async (user: JwtPayload | null) => {
@@ -146,26 +150,47 @@ const getReadingList = async (user: JwtPayload | null) => {
   return existingUser;
 };
 
+
 const removeUserPreference = async (
   user: JwtPayload | null,
   bookId: string
 ) => {
-  // want to remove the product id in the wishlist
-  console.log(bookId,'chekcing di')
-  const existingUser = (await User.findOne({ email: user?.email })) as User;
-  if (!existingUser) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'User does not exist');
+  const session = await startSession();
+  session.startTransaction();
+  try {
+    const existingUser = (await User.findOne({ email: user?.email }))
+    if (!existingUser) {
+      throw new ApiError(httpStatus.BAD_REQUEST, 'User does not exist');
+    }
+    const bookObjectId = new Types.ObjectId(bookId);
+    const existingBookPreference = existingUser.userPrefernce.find(
+      (preference) => preference.book.toString() === bookObjectId.toString()
+    );
+      console.log(existingBookPreference, 'existingBookPreference');
+      
+    if (!existingBookPreference) {
+      throw new ApiError(httpStatus.BAD_REQUEST, 'Book not found in user preference');
+    }
+
+    existingUser.userPrefernce = existingUser.userPrefernce.filter(
+      (pref) => pref.book.toString() !== bookObjectId.toString() );
+    const result = await existingUser.save();
+    console.log(result, 'checking result');
+
+    // remove user id from the book user preference
+     await bookService.removeUserPreference(bookId, existingUser._id);
+    // console.log(book, 'book FROM THE USER');
+    
+
+
+    await session.commitTransaction();
+    session.endSession();
+    return result;
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    throw error; // rethrow the error
   }
-
-  const bookObjectId = new Types.ObjectId(bookId);
-
-  existingUser.userPrefernce = existingUser.userPrefernce?.filter(
-    pref => !new Types.ObjectId(pref.book).equals(bookObjectId)
-  );
-
-  const result = await existingUser.save();
-
-  console.log(result, 'checking');
 };
 
 const finishedBooks = async (user: JwtPayload | null, bookId: string) => {
