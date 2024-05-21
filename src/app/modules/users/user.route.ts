@@ -24,17 +24,24 @@ router.post(
   UserController.refreshToken
 );
 
-router.post(
-  '/preference',
-  auth(ENUM_USER_ROLE.USER),
-  UserController.userPreference
-);
+// router.post(
+//   '/preference',
+//   auth(ENUM_USER_ROLE.USER),
+//   UserController.userPreference
+// );
 
 router.get(
   '/preferences',
   auth(ENUM_USER_ROLE.USER),
   UserController.getUserPreferences
 );
+
+router.delete(
+  '/remove/preferece/:bookId',
+  auth(ENUM_USER_ROLE.USER),
+  UserController.removeUserPreference
+);
+
 router.get(
   '/finishedBook',
   auth(ENUM_USER_ROLE.USER),
