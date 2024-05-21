@@ -7,8 +7,14 @@ import { IGenericResponse } from '../../../interfaces/common';
 import { IPaginationOptions } from '../../../interfaces/pagination';
 import { UserService } from '../users/user.service';
 import { bookSearchableFields } from './book.constant';
-import { IBook, IbookFilters } from './book.interface';
+import { IBook, IbookFilters, UserPref } from './book.interface';
 import { Book } from './book.model';
+
+interface Book extends Document {
+  userPreference: UserPref[];
+  save: () => Promise<void>;
+}
+
 
 const addBook = async (data: IBook) => {
   try {
@@ -60,6 +66,25 @@ const addUserPreference = async (req: Request) => {
     throw new ApiError(500, 'Something went wrong'); // rethrow the error
   }
 };
+
+const removeUserPreference = async (
+  bookId: string,
+  userId: string
+) => {
+  // want to remove the product id in the wishlist
+  console.log(bookId,'chekcing di')
+  const existingBook = await Book.findOne({
+    _id: bookId,
+  })
+  if (!existingBook) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'User does not exist');
+  }
+
+  const result = await Book.
+
+
+};
+
 
 const getAllBooks = async (
   filters: IbookFilters,
