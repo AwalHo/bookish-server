@@ -35,6 +35,19 @@ const getAllBooks = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const removeUserPreference = catchAsync(async (req: Request, res: Response) => {
+  const { bookId } = req.body;
+  const userId = req.user._id; // Assuming you have middleware to get the authenticated user
+
+  const result = await bookService.removeUserPreference(bookId, userId);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'User preference removed successfully',
+    data: result,
+  });
+});
+
 const getSingleBook = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
   const result = await bookService.getSingleBook(id);
@@ -117,4 +130,5 @@ export const BookController = {
   editBook,
   deleteBook,
   addUserPreference,
+  removeUserPreference
 };
