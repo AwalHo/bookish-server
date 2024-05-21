@@ -7,9 +7,10 @@ export type IUser = {
   password: string;
   role: string;
   _id: string;
-  userPrefernce?: string[];
+  userPrefernce?: UserPref[];
   readingList?: string[];
   finishedBooks?: string[];
+
 };
 
 export type UserPref = {
