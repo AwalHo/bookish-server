@@ -38,6 +38,7 @@ router.post(
   BookController.addUserPreference
 );
 
+router.get('/new/:status', BookController.getBooksByStatus);
 router.patch("/remove/preference", auth(ENUM_USER_ROLE.USER), BookController.removeUserPreference);
 
 export const BookRoutes = router;
