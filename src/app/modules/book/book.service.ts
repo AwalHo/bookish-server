@@ -154,6 +154,13 @@ const getAllBooks = async (
   };
 };
 
+const getBooksByStatus = async (status: string) => {
+  const books = await Book.find({ status });
+
+  return books;
+}
+
+
 const getSingleBook = async (id: string) => {
   const book = await Book.findById(id).lean().populate({
     path: 'reviews.userId',
@@ -224,5 +231,6 @@ export const bookService = {
   editBook,
   deleteBook,
   addUserPreference,
-  removeUserPreference
+  removeUserPreference,
+  getBooksByStatus,
 };
