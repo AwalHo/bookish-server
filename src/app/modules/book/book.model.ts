@@ -53,6 +53,10 @@ const BookSchema = new Schema<IBook>(
         rating: {
           type: String,
         },
+        createdAt: {
+          type: Date,
+          default: new Date(),
+        },
       },
     ],
     addedBy: {
