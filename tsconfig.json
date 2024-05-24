@@ -1,40 +1,11 @@
 {
   "compilerOptions": {
-    /* Basic Options */
     "target": "es6",
     "module": "commonjs",
-    "allowJs": true,
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": true,
-
-    /* Strict Type-Checking Options */
-    "strict": false,
-
-    /* Additional Checks */
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
-
-    /* Module Resolution Options */
-    "baseUrl": ".",
-    "paths": { "*": ["src/*"] },
-
-    /* Source Map Options */
-    "inlineSourceMap": true,
-
-    /* Experimental Options */
-    "experimentalDecorators": false,
-    "emitDecoratorMetadata": false,
-
-    /* Advanced Options */
-    "forceConsistentCasingInFileNames": true,
-    "skipLibCheck": true,
-    "allowSyntheticDefaultImports": true,
+    "outDir": "./dist",
+    "strict": true,
     "esModuleInterop": true
   },
-  "include": ["src"],
+  "include": ["src/**/*.ts"],
   "exclude": ["node_modules"]
 }
