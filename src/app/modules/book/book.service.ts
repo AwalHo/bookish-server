@@ -118,12 +118,21 @@ const getAllBooks = async (
   }
 
   if (Object.keys(filtersData).length) {
-    andConditions.push({
-      $and: Object.entries(filtersData).map(([key, value]) => ({
-        [key]: value,
-      })),
-    });
-  }
+    
+    Object.entries(filtersData).map(([key, value]) => {
+      if (Array.isArray(value)) {
+        andConditions.push({
+          $or: value.map(val => ({
+            [key]: val
+          }))
+        });
+      } else {
+        andConditions.push({
+          [key]: value
+        });
+      }
+    })
+}
 
   // dynamic sort needs fild to do sorting on
 
