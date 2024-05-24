@@ -43,6 +43,7 @@ export type IbookFilters = {
   searchTerm?: string;
   genre?: string;
   publicationYear?: string;
+  status?: string;
 };
 
 export type BookModel = Model<IBook, Record<string, unknown>>;
