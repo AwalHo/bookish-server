@@ -99,7 +99,7 @@ const userPreference = async ({
   }
 console.log(existingUser, 'existingUser checking again');
 
-  const existingPreference = existingUser.userPrefernce.find(pref => new Types.ObjectId(pref.book).toString() === bookId.toString());
+  const existingPreference = existingUser?.userPrefernce?.find(pref => new Types.ObjectId(pref.book).toString() === bookId.toString());
   console.log(existingPreference, 'existingPreference checking');
   
 
@@ -107,7 +107,7 @@ console.log(existingUser, 'existingUser checking again');
     existingPreference.status = status;
     existingPreference.updatedAt = new Date();
   }else{
-    existingUser.userPrefernce.push({
+    existingUser?.userPrefernce?.push({
       book: bookId,
       status,
     updatedAt: new Date()
@@ -163,7 +163,7 @@ const removeUserPreference = async (
       throw new ApiError(httpStatus.BAD_REQUEST, 'User does not exist');
     }
     const bookObjectId = new Types.ObjectId(bookId);
-    const existingBookPreference = existingUser.userPrefernce.find(
+    const existingBookPreference = existingUser?.userPrefernce?.find(
       (preference) => preference.book.toString() === bookObjectId.toString()
     );
       console.log(existingBookPreference, 'existingBookPreference');
@@ -172,7 +172,7 @@ const removeUserPreference = async (
       throw new ApiError(httpStatus.BAD_REQUEST, 'Book not found in user preference');
     }
 
-    existingUser.userPrefernce = existingUser.userPrefernce.filter(
+    existingUser.userPrefernce = existingUser?.userPrefernce?.filter(
       (pref) => pref.book.toString() !== bookObjectId.toString() );
     const result = await existingUser.save();
     console.log(result, 'checking result');
