@@ -50,7 +50,7 @@ const getBooksByStatus = catchAsync(async (req: Request, res: Response) => {
 
 const removeUserPreference = catchAsync(async (req: Request, res: Response) => {
   const { bookId } = req.body;
-  const userId = req.user._id; // Assuming you have middleware to get the authenticated user
+  const userId = req.user?._id; // Assuming you have middleware to get the authenticated user
 
   const result = await bookService.removeUserPreference(bookId, userId);
   sendResponse(res, {
